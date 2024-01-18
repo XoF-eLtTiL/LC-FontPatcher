@@ -54,38 +54,28 @@ class FontLoader
     [HarmonyPrefix, HarmonyPatch(typeof(TMP_FontAsset), "Awake")]
     static void PrefixAwake(TMP_FontAsset __instance)
     {
-        string prevFontName = __instance.name.Split(" ")[0];
-
-        switch (prevFontName)
+        // 添加Normal字体回退
+        if (Plugin.Instance.configNormalIngameFont.Value)
         {
-            case "3270-Regular":
-            case "3270-HUDIngame":
-            case "3270-HUDIngameB":
-            case "DialogueText":
-            case "b":
-                if (!Plugin.Instance.configNormalIngameFont.Value)
+            foreach (FontBundle bundle in fontBundles)
+            {
+                if (bundle.Normal != null)
                 {
-                    DisableFont(__instance);
-                }
-                foreach (FontBundle bundle in fontBundles)
-                {
-                    if (!bundle.Normal) continue;
                     __instance.fallbackFontAssetTable.Add(bundle.Normal);
                 }
-                break;
-            case "edunline":
-                if (!Plugin.Instance.configTransmitIngameFont.Value)
+            }
+        }
+
+        // 添加Transmit字体回退
+        if (Plugin.Instance.configTransmitIngameFont.Value)
+        {
+            foreach (FontBundle bundle in fontBundles)
+            {
+                if (bundle.Transmit != null)
                 {
-                    DisableFont(__instance);
-                }
-                foreach (FontBundle bundle in fontBundles)
-                {
-                    if (!bundle.Transmit) continue;
                     __instance.fallbackFontAssetTable.Add(bundle.Transmit);
                 }
-                break;
-            default:
-                break;
+            }
         }
     }
 
